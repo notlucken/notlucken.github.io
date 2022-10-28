@@ -2,7 +2,7 @@
 layout: single
 title:  Chmod - Privilege Escalation 
 excerpt: "Guia de como escalar privilegios cuando se puede ejecutar chmod como Sudo"
-date: 2022-10-27
+date: 2022-10-28
 classes: wide
 header:
   teaser: /assets/images/chmodPrivilege/logo.png

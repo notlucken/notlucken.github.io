@@ -2,7 +2,7 @@
 layout: single
 title: PwnKit - Privilege Escalation
 excerpt: "Explicacion de que es el PwnKit y como explotarlo."
-date: 2022-10-28
+date: 2022-10-27
 classes: wide
 header:
   teaser: /assets/images/pwnKit/logo.png
