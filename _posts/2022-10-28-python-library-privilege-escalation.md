@@ -15,7 +15,8 @@ tags:
   - Trabajo
 ---
 
-<p img src='/assets/images/pythonLibrary/logo.jpg' width=200>
+<p align="center">
+<img src="/assets/images/pythonLibrary/logo.jpg" width="400">
 </p>
 1) Primero hay que localizar un Script que el dueño sea root
 
