@@ -5,15 +5,18 @@ excerpt: "Hoy aprenderemos como escalar privilegios con una libreria de Python"
 date: 2022-10-27
 classes: wide
 header:
-  teaser: /assets/images/tratamientoTTY/logo.png
+  teaser: /assets/images/pythonLibrary/logo.jpeg
   teaser_home_page: true
 categories:
   - Tecnicas
 tags:
   - Escalada de Privilegios
   - Hijacking
-  - Pyton
+  - Trabajo
 ---
+
+<p img src='/assets/images/pythonLibrary/logo.jpeg' width=200>
+</p>
 1) Primero hay que localizar un Script que el dueño sea root
 
 2) Luego al entrar a ese script, veremos que se utiliza alguna librería, y deberemos buscarla en /usr/lib/python... 
