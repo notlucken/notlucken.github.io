@@ -5,7 +5,7 @@ excerpt: "Hoy aprenderemos como escalar privilegios con una libreria de Python"
 date: 2022-10-27
 classes: wide
 header:
-  teaser: /assets/images/pythonLibrary/logo.jpeg
+  teaser: /assets/images/pythonLibrary/logo.jpg
   teaser_home_page: true
 categories:
   - Tecnicas
@@ -15,7 +15,7 @@ tags:
   - Trabajo
 ---
 
-<p img src='/assets/images/pythonLibrary/logo.jpeg' width=200>
+<p img src='/assets/images/pythonLibrary/logo.jpg' width=200>
 </p>
 1) Primero hay que localizar un Script que el dueño sea root
 
